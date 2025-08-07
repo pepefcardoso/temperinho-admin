@@ -59,7 +59,7 @@ export async function logout() {
   }
 
   cookieStore.delete("session_token");
-  redirect("/login");
+  redirect("/auth/login");
 }
 
 export async function getSession(): Promise<{ user: User } | null> {

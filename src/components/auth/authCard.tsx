@@ -2,7 +2,6 @@ import {
     Card,
     CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
@@ -13,14 +12,12 @@ type AuthCardProps = CardProps & {
     cardTitle: string;
     cardDescription: string;
     children: React.ReactNode;
-    footer: React.ReactNode;
 };
 
 export function AuthCard({
     cardTitle,
     cardDescription,
     children,
-    footer,
     ...props
 }: AuthCardProps) {
     return (
@@ -30,7 +27,6 @@ export function AuthCard({
                 <CardDescription>{cardDescription}</CardDescription>
             </CardHeader>
             <CardContent>{children}</CardContent>
-            <CardFooter>{footer}</CardFooter>
         </Card>
     );
 }
