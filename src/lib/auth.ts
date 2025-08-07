@@ -2,34 +2,21 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import axios from "axios";
-import { AuthResponse, AuthState } from "./types/api";
-import { loginSchema } from "./schemas/auth";
+import { AuthState } from "./types/api";
+import {
+  loginWithCredentials,
+  logoutFromApi,
+  fetchUserProfile,
+} from "./api/auth";
 import { User } from "./types/user";
+import axios from "axios";
 
 export async function login(
-  prevState: AuthState | undefined,
+  _prevState: AuthState | undefined,
   formData: FormData
 ): Promise<AuthState> {
-  const validatedFields = loginSchema.safeParse(
-    Object.fromEntries(formData.entries())
-  );
-
-  if (!validatedFields.success) {
-    return {
-      message: validatedFields.error.issues.map((e) => e.message).join(", "),
-      success: false,
-    };
-  }
-
-  const { email, password } = validatedFields.data;
-
   try {
-    const response = await axios.post<AuthResponse>(
-      `${process.env.API_URL}/api/auth/login`,
-      { email, password }
-    );
-    const { token } = response.data;
+    const { token } = await loginWithCredentials(formData);
 
     const cookieStore = await cookies();
     cookieStore.set("session_token", token, {
@@ -46,8 +33,12 @@ export async function login(
         success: false,
       };
     }
+    if (error instanceof Error) {
+      return { message: error.message, success: false };
+    }
     return {
-      message: "Ocorreu um erro. Por favor, tente novamente mais tarde.",
+      message:
+        "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.",
       success: false,
     };
   }
@@ -61,11 +52,7 @@ export async function logout() {
 
   if (token) {
     try {
-      await axios.post(
-        `${process.env.API_URL}/api/auth/logout`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await logoutFromApi(token);
     } catch (error) {
       console.error("Falha ao fazer logout na API:", error);
     }
@@ -84,17 +71,8 @@ export async function getSession(): Promise<{ user: User } | null> {
   }
 
   try {
-    const response = await axios.get<{ data: User }>(
-      `${process.env.API_URL}/api/users/me`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-        },
-      }
-    );
-
-    return { user: response.data.data };
+    const { user } = await fetchUserProfile(token);
+    return { user };
   } catch {
     return null;
   }
