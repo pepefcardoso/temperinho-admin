@@ -10,6 +10,7 @@ import {
 } from "./api/auth";
 import { User } from "./types/user";
 import axios from "axios";
+import { cache } from "react";
 
 export async function login(
   _prevState: AuthState | undefined,
@@ -62,7 +63,10 @@ export async function logout() {
   redirect("/auth/login");
 }
 
-export async function getSession(): Promise<{ user: User } | null> {
+export async function getSession(): Promise<{
+  user: User;
+  token: string;
+} | null> {
   const cookieStore = await cookies();
   const token = cookieStore.get("session_token")?.value;
 
@@ -72,12 +76,8 @@ export async function getSession(): Promise<{ user: User } | null> {
 
   try {
     const { user } = await fetchUserProfile(token);
-    return { user };
+    return { user, token };
   } catch {
     return null;
   }
-}
-
-export async function getUserSession(): Promise<{ user: User } | null> {
-  return getSession();
 }

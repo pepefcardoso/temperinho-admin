@@ -1,14 +1,15 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
-import { updateProfileAction } from "@/lib/actions/user";
+import { updateProfileAction, ProfileActionState } from "@/lib/actions/user";
 import { User } from "@/lib/types/user";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { AvatarUpload } from "./avatarUpload";
+import { useUserStore } from "@/stores/userStore";
 
 function SubmitButton() {
     const { pending } = useFormStatus();
@@ -20,9 +21,16 @@ function SubmitButton() {
 }
 
 export function ProfileForm({ user }: { user: User }) {
-    const initialState = { message: "", success: false };
+    const { setUser } = useUserStore();
+    const initialState: ProfileActionState = { message: "", success: false, user: undefined };
     const updateUserWithId = updateProfileAction.bind(null, user.id);
     const [state, dispatch] = useActionState(updateUserWithId, initialState);
+
+    useEffect(() => {
+        if (state.success && state.user) {
+            setUser(state.user);
+        }
+    }, [state, setUser]);
 
     return (
         <Card>

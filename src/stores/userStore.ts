@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { User } from "@/lib/types/user";
-import { getUserSession } from "@/lib/auth";
+import { getSession } from "@/lib/auth";
 
 interface UserState {
   user: User | null;
@@ -19,7 +19,7 @@ export const useUserStore = create<UserState>((set, get) => ({
     }
 
     try {
-      const session = await getUserSession();
+      const session = await getSession();
       if (session) {
         set({ user: session.user });
       }

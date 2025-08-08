@@ -1,18 +1,11 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
     ColumnDef,
-    ColumnFiltersState,
-    SortingState,
-    VisibilityState,
     flexRender,
-    getCoreRowModel,
-    getFilteredRowModel,
-    getPaginationRowModel,
-    getSortedRowModel,
-    useReactTable,
-} from "@tanstack/react-table"
+    Table as TanstackTable,
+} from "@tanstack/react-table";
 
 import {
     Table,
@@ -21,63 +14,49 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
     DropdownMenuContent,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Icon } from "../ui/icon"
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Icon } from "../ui/icon";
+import { useDebounce } from "@/hooks/useDebounce";
 
 interface DataTableProps<TData, TValue> {
-    columns: ColumnDef<TData, TValue>[]
-    data: TData[]
-    filterColumn: string
-    filterPlaceholder?: string
+    columns: ColumnDef<TData, TValue>[];
+    table: TanstackTable<TData>;
+    filterColumn: string;
+    filterPlaceholder?: string;
 }
 
 export function DataTable<TData, TValue>({
     columns,
-    data,
+    table,
     filterColumn,
     filterPlaceholder = "Filtrar...",
 }: DataTableProps<TData, TValue>) {
-    const [sorting, setSorting] = React.useState<SortingState>([])
-    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
-    const [rowSelection, setRowSelection] = React.useState({})
 
-    const table = useReactTable({
-        data,
-        columns,
-        onSortingChange: setSorting,
-        onColumnFiltersChange: setColumnFilters,
-        getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
-        getSortedRowModel: getSortedRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
-        onColumnVisibilityChange: setColumnVisibility,
-        onRowSelectionChange: setRowSelection,
-        state: {
-            sorting,
-            columnFilters,
-            columnVisibility,
-            rowSelection,
-        },
-    })
+    const [filterValue, setFilterValue] = React.useState(
+        (table.getColumn(filterColumn)?.getFilterValue() as string) ?? ""
+    );
+
+    const debouncedFilter = useDebounce(filterValue, 300);
+
+    React.useEffect(() => {
+        table.getColumn(filterColumn)?.setFilterValue(debouncedFilter);
+    }, [debouncedFilter, filterColumn, table]);
 
     return (
         <div className="w-full">
             <div className="flex items-center py-4">
                 <Input
                     placeholder={filterPlaceholder}
-                    value={(table.getColumn(filterColumn)?.getFilterValue() as string) ?? ""}
-                    onChange={(event) =>
-                        table.getColumn(filterColumn)?.setFilterValue(event.target.value)
-                    }
+                    value={filterValue}
+                    onChange={(event) => setFilterValue(event.target.value)}
                     className="max-w-sm"
                 />
                 <DropdownMenu>
@@ -100,9 +79,12 @@ export function DataTable<TData, TValue>({
                                             column.toggleVisibility(!!value)
                                         }
                                     >
-                                        {column.id}
+                                        {/* Tenta usar um nome mais amigável para a coluna se disponível */}
+                                        {typeof column.columnDef.header === 'string'
+                                            ? column.columnDef.header
+                                            : column.id}
                                     </DropdownMenuCheckboxItem>
-                                )
+                                );
                             })}
                     </DropdownMenuContent>
                 </DropdownMenu>
@@ -112,18 +94,29 @@ export function DataTable<TData, TValue>({
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => {
-                                    return (
-                                        <TableHead key={header.id}>
-                                            {header.isPlaceholder
-                                                ? null
-                                                : flexRender(
+                                {headerGroup.headers.map((header) => (
+                                    <TableHead key={header.id}>
+                                        {header.isPlaceholder ? null : (
+                                            <div
+                                                {...{
+                                                    className: header.column.getCanSort()
+                                                        ? 'cursor-pointer select-none flex items-center gap-2'
+                                                        : '',
+                                                    onClick: header.column.getToggleSortingHandler(),
+                                                }}
+                                            >
+                                                {flexRender(
                                                     header.column.columnDef.header,
                                                     header.getContext()
                                                 )}
-                                        </TableHead>
-                                    )
-                                })}
+                                                {{
+                                                    asc: <Icon name="ArrowUp" className="h-4 w-4" />,
+                                                    desc: <Icon name="ArrowDown" className="h-4 w-4" />,
+                                                }[header.column.getIsSorted() as string] ?? null}
+                                            </div>
+                                        )}
+                                    </TableHead>
+                                ))}
                             </TableRow>
                         ))}
                     </TableHeader>
@@ -162,7 +155,12 @@ export function DataTable<TData, TValue>({
                     {table.getFilteredSelectedRowModel().rows.length} de{" "}
                     {table.getFilteredRowModel().rows.length} linha(s) selecionada(s).
                 </div>
-                <div className="space-x-2">
+                <div className="flex items-center space-x-2">
+                    <span className="text-sm">
+                        Página{" "}
+                        {table.getState().pagination.pageIndex + 1} de{" "}
+                        {table.getPageCount()}
+                    </span>
                     <Button
                         variant="outline"
                         size="sm"
@@ -182,5 +180,5 @@ export function DataTable<TData, TValue>({
                 </div>
             </div>
         </div>
-    )
+    );
 }

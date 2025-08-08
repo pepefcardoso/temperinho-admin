@@ -1,29 +1,17 @@
 import * as React from "react";
-import { type ColumnDef } from "@tanstack/react-table";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { DataTable } from "@/components/shared/dataTable";
 
-interface EntityPageProps<TData, TValue> {
+interface EntityPageProps {
     title: string;
     description: string;
-    columns: ColumnDef<TData, TValue>[];
-    data: TData[];
-    filterColumn: string;
-    filterPlaceholder?: string;
-    actionButton1?: React.ReactNode;
-    actionButton2?: React.ReactNode;
+    children: React.ReactNode;
 }
 
-export function EntityPage<TData, TValue>({
+export function EntityPage({
     title,
     description,
-    columns,
-    data,
-    filterColumn,
-    filterPlaceholder,
-    actionButton1,
-    actionButton2,
-}: EntityPageProps<TData, TValue>): React.ReactElement {
+    children
+}: EntityPageProps): React.ReactElement {
     return (
         <div className="p-4 sm:p-6 md:p-8">
             <Card className="border-none shadow-sm">
@@ -35,19 +23,10 @@ export function EntityPage<TData, TValue>({
                                 {description}
                             </CardDescription>
                         </div>
-                        <div className="flex items-center gap-2">
-                            {actionButton1}
-                            {actionButton2}
-                        </div>
                     </div>
                 </CardHeader>
                 <CardContent>
-                    <DataTable
-                        columns={columns}
-                        data={data}
-                        filterColumn={filterColumn}
-                        filterPlaceholder={filterPlaceholder}
-                    />
+                    {children}
                 </CardContent>
             </Card>
         </div>
