@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { logout } from "@/lib/auth";
 import { User } from "@/lib/types/user";
+import { cn } from "@/lib/utils";
 
 function getInitials(name: string): string {
     const names = name.split(" ");
@@ -24,7 +25,7 @@ function getInitials(name: string): string {
     return initials.toUpperCase();
 }
 
-export function UserNav({ user }: { user: User }) {
+export function UserNav({ user, isCollapsed }: { user: User; isCollapsed: boolean }) {
     if (!user) {
         return null;
     }
@@ -35,11 +36,24 @@ export function UserNav({ user }: { user: User }) {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                    <Avatar className="h-8 w-8">
+                <Button
+                    variant="ghost"
+                    className={cn(
+                        "w-full flex justify-start items-center gap-3 p-2 cursor-pointer",
+                        isCollapsed && "justify-center p-0"
+                    )}
+                >
+                    <Avatar className="h-8 w-8 transition-all ring-offset-background hover:ring-2 hover:ring-ring hover:ring-offset-2">
                         <AvatarImage src="/images/avatar.png" alt={`@${name}`} />
                         <AvatarFallback>{initials}</AvatarFallback>
                     </Avatar>
+
+                    <div className={cn("flex flex-col items-start", isCollapsed && "hidden")}>
+                        <p className="text-sm font-medium leading-none">{name}</p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                            {email}
+                        </p>
+                    </div>
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end" forceMount>
@@ -54,11 +68,10 @@ export function UserNav({ user }: { user: User }) {
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                     <DropdownMenuItem>Perfil</DropdownMenuItem>
-                    <DropdownMenuItem>Configurações</DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <form action={logout} className="w-full">
-                    <button type="submit" className="w-full">
+                    <button type="submit" className="w-full text-left">
                         <DropdownMenuItem>
                             Sair
                         </DropdownMenuItem>
