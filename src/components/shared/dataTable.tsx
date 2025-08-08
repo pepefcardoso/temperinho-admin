@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Icon } from "./ui/icon"
+import { Icon } from "../ui/icon"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]

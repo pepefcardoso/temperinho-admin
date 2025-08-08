@@ -1,7 +1,10 @@
+"use client";
 
+import { PlusCircle, Download } from "lucide-react";
 import { Payment } from "@/lib/types/payment";
 import { columns } from "./columns";
-import { DataTable } from "@/components/dataTable";
+import { EntityPage } from "@/components/shared/entityPage";
+import { Button } from "@/components/ui/button";
 
 const payments: Payment[] = [
   {
@@ -28,15 +31,34 @@ const payments: Payment[] = [
 ];
 
 export default function PaymentsPage() {
+  const handleNovoPagamento = () => {
+    //
+  };
+
+  const handleExportar = () => {
+    //
+  };
+
   return (
-    <div className="container mx-auto py-10">
-      <h2 className="text-3xl font-bold tracking-tight mb-6">Pagamentos</h2>
-      <DataTable 
-        columns={columns} 
-        data={payments} 
-        filterColumn="status"
-        filterPlaceholder="Filtrar por status..."
-      />
-    </div>
+    <EntityPage
+      title="Pagamentos"
+      description="Visualize e gerencie todos os pagamentos registrados."
+      columns={columns}
+      data={payments}
+      filterColumn="status"
+      filterPlaceholder="Filtrar por status..."
+      actionButton1={
+        <Button onClick={handleNovoPagamento}>
+          <PlusCircle className="mr-2 h-4 w-4" />
+          Novo Pagamento
+        </Button>
+      }
+      actionButton2={
+        <Button variant="outline" onClick={handleExportar}>
+          <Download className="mr-2 h-4 w-4" />
+          Exportar
+        </Button>
+      }
+    />
   );
 }
