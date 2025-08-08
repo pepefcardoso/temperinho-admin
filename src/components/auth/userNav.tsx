@@ -1,3 +1,5 @@
+"use client";
+
 import {
     Avatar,
     AvatarFallback,
@@ -13,7 +15,8 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { getSession, logout } from "@/lib/auth";
+import { logout } from "@/lib/auth";
+import { User } from "@/lib/types/user";
 
 function getInitials(name: string): string {
     const names = name.split(" ");
@@ -21,14 +24,12 @@ function getInitials(name: string): string {
     return initials.toUpperCase();
 }
 
-export async function UserNav() {
-    const session = await getSession();
-
-    if (!session) {
+export function UserNav({ user }: { user: User }) {
+    if (!user) {
         return null;
     }
 
-    const { name, email } = session.user;
+    const { name, email } = user;
     const initials = getInitials(name);
 
     return (
@@ -36,7 +37,7 @@ export async function UserNav() {
             <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                     <Avatar className="h-8 w-8">
-                        <AvatarImage src="images/avatar.png" alt={`@${name}`} />
+                        <AvatarImage src="/images/avatar.png" alt={`@${name}`} />
                         <AvatarFallback>{initials}</AvatarFallback>
                     </Avatar>
                 </Button>

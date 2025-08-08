@@ -15,8 +15,9 @@ import {
 import { Icon } from "@/components/ui/icon";
 import { UserNav } from "@/components/auth/userNav";
 import { PanelLeftClose, PanelRightClose } from "lucide-react";
+import { User } from "@/lib/types/user";
 
-export function Sidebar() {
+export function Sidebar({ user }: { user: User }) {
     const pathname = usePathname();
     const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -77,7 +78,7 @@ export function Sidebar() {
                 </TooltipProvider>
             </nav>
             <div className="absolute bottom-0 w-full border-t p-2">
-                <UserNav />
+                <UserNav user={user} />
             </div>
         </div>
     );
