@@ -15,7 +15,7 @@ import {
 import { Icon } from "@/components/ui/icon";
 import { UserNav } from "@/components/auth/userNav";
 import { ChevronDown, PanelLeftClose, PanelRightClose } from "lucide-react";
-import { User } from "@/lib/types/user";
+import { useUserStore } from "@/stores/userStore";
 
 const findActiveGroup = (groups: NavGroup[], pathname: string): string | null => {
     for (const group of groups) {
@@ -26,14 +26,20 @@ const findActiveGroup = (groups: NavGroup[], pathname: string): string | null =>
     return null;
 };
 
-export function Sidebar({ user }: { user: User }) {
+export function Sidebar() {
     const pathname = usePathname();
     const [isCollapsed, setIsCollapsed] = useState(false);
-
+    const { user, fetchUser } = useUserStore();
     const [openGroups, setOpenGroups] = useState<string[]>(() => {
         const activeGroup = findActiveGroup(dashboardConfig.navGroups, pathname);
         return activeGroup ? [activeGroup] : [];
     });
+
+    useEffect(() => {
+        if (!user) {
+            fetchUser();
+        }
+    }, [user, fetchUser]);
 
     useEffect(() => {
         const activeGroup = findActiveGroup(dashboardConfig.navGroups, pathname);
@@ -150,7 +156,7 @@ export function Sidebar({ user }: { user: User }) {
             </nav>
 
             <div className="mt-auto shrink-0 border-t p-2">
-                <UserNav user={user} isCollapsed={isCollapsed}/>
+                <UserNav user={user} isCollapsed={isCollapsed} />
             </div>
         </div>
     );

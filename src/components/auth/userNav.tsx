@@ -18,6 +18,9 @@ import {
 import { logout } from "@/lib/auth";
 import { User } from "@/lib/types/user";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useUserStore } from "@/stores/userStore";
 
 function getInitials(name: string): string {
     const names = name.split(" ");
@@ -25,13 +28,34 @@ function getInitials(name: string): string {
     return initials.toUpperCase();
 }
 
-export function UserNav({ user, isCollapsed }: { user: User; isCollapsed: boolean }) {
+function UserNavSkeleton({ isCollapsed }: { isCollapsed: boolean }) {
+    if (isCollapsed) {
+        return <Skeleton className="h-9 w-9 rounded-full" />;
+    }
+    return (
+        <div className="flex items-center gap-3 p-2">
+            <Skeleton className="h-8 w-8 rounded-full" />
+            <div className="flex flex-col gap-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-3 w-32" />
+            </div>
+        </div>
+    );
+}
+
+export function UserNav({ user, isCollapsed }: { user: User | null; isCollapsed: boolean }) {
+    const { clearUser } = useUserStore();
     if (!user) {
-        return null;
+        return <UserNavSkeleton isCollapsed={isCollapsed} />;
     }
 
-    const { name, email } = user;
+    const { name, email, image } = user;
     const initials = getInitials(name);
+
+    const handleLogout = async () => {
+        clearUser();
+        await logout();
+    };
 
     return (
         <DropdownMenu>
@@ -40,11 +64,11 @@ export function UserNav({ user, isCollapsed }: { user: User; isCollapsed: boolea
                     variant="ghost"
                     className={cn(
                         "w-full flex justify-start items-center gap-3 p-2 cursor-pointer",
-                        isCollapsed && "justify-center p-0"
+                        isCollapsed && "justify-center p-0 h-9 w-9"
                     )}
                 >
                     <Avatar className="h-8 w-8 transition-all ring-offset-background hover:ring-2 hover:ring-ring hover:ring-offset-2">
-                        <AvatarImage src="/images/avatar.png" alt={`@${name}`} />
+                        <AvatarImage src={image?.url} alt={`@${name}`} />
                         <AvatarFallback>{initials}</AvatarFallback>
                     </Avatar>
 
@@ -67,10 +91,14 @@ export function UserNav({ user, isCollapsed }: { user: User; isCollapsed: boolea
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                    <DropdownMenuItem>Perfil</DropdownMenuItem>
+                    <Link href="/dashboard/profile">
+                        <DropdownMenuItem>
+                            Perfil
+                        </DropdownMenuItem>
+                    </Link>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <form action={logout} className="w-full">
+                <form action={handleLogout} className="w-full">
                     <button type="submit" className="w-full text-left">
                         <DropdownMenuItem>
                             Sair

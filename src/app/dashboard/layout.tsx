@@ -1,6 +1,7 @@
 import { Sidebar } from "@/components/sidebar";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { UserSessionProvider } from "@/components/auth/userSessionProvider";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -16,9 +17,11 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="flex min-h-screen">
-      <Sidebar user={session.user} />
-      <main className="flex-1 p-8">{children}</main>
-    </div>
+    <UserSessionProvider initialUser={session.user}>
+      <div className="flex min-h-screen">
+        <Sidebar />
+        <main className="flex-1 p-8">{children}</main>
+      </div>
+    </UserSessionProvider>
   );
 }

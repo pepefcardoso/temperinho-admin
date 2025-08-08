@@ -77,3 +77,7 @@ export async function getSession(): Promise<{ user: User } | null> {
     return null;
   }
 }
+
+export async function getUserSession(): Promise<{ user: User } | null> {
+  return getSession();
+}
