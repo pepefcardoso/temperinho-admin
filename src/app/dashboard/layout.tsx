@@ -1,17 +1,19 @@
 import { Sidebar } from "@/components/sidebar";
-import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { UserSessionProvider } from "@/components/auth/userSessionProvider";
-
-interface DashboardLayoutProps {
-  children: React.ReactNode;
-}
+import { getToken, getSession } from "@/lib/auth";
 
 export default async function DashboardLayout({
   children,
-}: DashboardLayoutProps) {
-  const session = await getSession();
+}: {
+  children: React.ReactNode;
+}) {
+  const token = await getToken();
+  if (!token) {
+    redirect("/auth/login?error=invalid_session");
+  }
 
+  const session = await getSession(token);
   if (!session) {
     redirect("/auth/login?error=invalid_session");
   }
