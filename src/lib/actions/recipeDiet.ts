@@ -6,9 +6,24 @@ import {
   createRecipeDiet,
   updateRecipeDiet,
   deleteRecipeDiet as deleteDietApi,
+  getRecipeDiets,
 } from "@/lib/api/recipeDiets";
 import { recipeDietSchema } from "@/lib/schemas/recipeDiet";
-import { ActionState } from "../types/api";
+import { ActionState, FetchParams, PaginatedResponse } from "../types/api";
+import { RecipeDiet } from "../types/recipe";
+
+export async function getDietsAction(
+  params: FetchParams
+): Promise<PaginatedResponse<RecipeDiet>> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("session_token")?.value;
+  if (!token) {
+    throw new Error("Não autorizado");
+  }
+
+  const diets = await getRecipeDiets(token, params);
+  return diets;
+}
 
 export async function createDietAction(
   _prevState: ActionState | undefined,

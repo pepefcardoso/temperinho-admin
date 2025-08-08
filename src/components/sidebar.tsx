@@ -29,23 +29,20 @@ const findActiveGroup = (groups: NavGroup[], pathname: string): string | null =>
 export function Sidebar() {
     const pathname = usePathname();
     const [isCollapsed, setIsCollapsed] = useState(false);
-    const { user, fetchUser } = useUserStore();
+    const { user } = useUserStore(); // Removido fetchUser daqui
     const [openGroups, setOpenGroups] = useState<string[]>(() => {
         const activeGroup = findActiveGroup(dashboardConfig.navGroups, pathname);
         return activeGroup ? [activeGroup] : [];
     });
 
-    useEffect(() => {
-        if (!user) {
-            fetchUser();
-        }
-    }, [user, fetchUser]);
+    // O useEffect que chamava fetchUser foi removido.
 
     useEffect(() => {
         const activeGroup = findActiveGroup(dashboardConfig.navGroups, pathname);
         if (activeGroup && !openGroups.includes(activeGroup)) {
             setOpenGroups(prev => [...prev, activeGroup]);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [pathname]);
 
     const toggleSidebar = () => {

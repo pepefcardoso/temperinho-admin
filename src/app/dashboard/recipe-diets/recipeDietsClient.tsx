@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import {
     useReactTable,
     getCoreRowModel,
@@ -15,28 +15,20 @@ import { PlusCircle } from "lucide-react";
 import { RecipeDiet } from "@/lib/types/recipe";
 import { getColumns } from "./columns";
 import { Toaster, toast } from "sonner";
-import { getRecipeDiets } from "@/lib/api/recipeDiets";
-import { PaginatedResponse } from "@/lib/types/api";
 import { RecipeDietForm } from "@/components/recipeDiets/recipeDietsForm";
+import { getDietsAction } from "@/lib/actions/recipeDiet"; // Importe a nova action
 
-interface RecipeDietsClientProps {
-    initialData: PaginatedResponse<RecipeDiet>;
-    token: string;
-}
-
-export function RecipeDietsClient({
-    initialData,
-    token,
-}: RecipeDietsClientProps) {
-    const [data, setData] = useState(initialData.data);
-    const [pageCount, setPageCount] = useState(initialData.meta.last_page);
+// Removido initialData e token das props
+export function RecipeDietsClient() {
+    const [data, setData] = useState<RecipeDiet[]>([]);
+    const [pageCount, setPageCount] = useState(0);
 
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [selectedDiet, setSelectedDiet] = useState<RecipeDiet | null>(null);
 
     const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
-        pageIndex: initialData.meta.current_page - 1,
-        pageSize: initialData.meta.per_page,
+        pageIndex: 0,
+        pageSize: 10,
     });
     const [sorting, setSorting] = useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -47,32 +39,25 @@ export function RecipeDietsClient({
         [columnFilters]
     );
 
-    const didMountRef = useRef(false);
+    const fetchData = useCallback(async () => {
+        try {
+            const result = await getDietsAction({
+                pageIndex,
+                pageSize,
+                sorting,
+                searchTerm,
+            });
+            setData(result.data);
+            setPageCount(result.meta.last_page);
+        } catch (error) {
+            console.error("Erro ao buscar dados das dietas:", error);
+            toast.error("Falha ao buscar dados das dietas.");
+        }
+    }, [pageIndex, pageSize, sorting, searchTerm]);
 
     useEffect(() => {
-        if (!didMountRef.current) {
-            didMountRef.current = true;
-            return;
-        }
-
-        const fetchData = async () => {
-            try {
-                const result = await getRecipeDiets(token, {
-                    pageIndex,
-                    pageSize,
-                    sorting,
-                    searchTerm,
-                });
-                setData(result.data);
-                setPageCount(result.meta.last_page);
-            } catch (error) {
-                console.error("Erro ao buscar dados das dietas:", error);
-                toast.error("Falha ao buscar dados das dietas.");
-            }
-        };
-
         fetchData();
-    }, [pageIndex, pageSize, sorting, searchTerm, token]);
+    }, [fetchData]);
 
     const handleNew = () => {
         setSelectedDiet(null);

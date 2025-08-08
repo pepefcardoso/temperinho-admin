@@ -63,21 +63,23 @@ export async function logout() {
   redirect("/auth/login");
 }
 
-export async function getSession(): Promise<{
-  user: User;
-  token: string;
-} | null> {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("session_token")?.value;
+export const getSession = cache(
+  async (): Promise<{
+    user: User;
+    token: string;
+  } | null> => {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("session_token")?.value;
 
-  if (!token) {
-    return null;
-  }
+    if (!token) {
+      return null;
+    }
 
-  try {
-    const { user } = await fetchUserProfile(token);
-    return { user, token };
-  } catch {
-    return null;
+    try {
+      const { user } = await fetchUserProfile(token);
+      return { user, token };
+    } catch {
+      return null;
+    }
   }
-}
+);
