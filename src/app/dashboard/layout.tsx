@@ -6,11 +6,13 @@ interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
-export default async function DashboardLayout({ children }: DashboardLayoutProps) {
+export default async function DashboardLayout({
+  children,
+}: DashboardLayoutProps) {
   const session = await getSession();
 
   if (!session) {
-    redirect("/auth/login");
+    redirect("/auth/login?error=invalid_session");
   }
 
   return (
