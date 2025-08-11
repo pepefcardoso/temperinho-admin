@@ -14,15 +14,18 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RecipeDiet } from "@/lib/types/recipe";
-import { createDietAction, updateDietAction } from "@/lib/actions/recipeDiet";
+import { RecipeCategory } from "@/lib/types/recipe";
+import {
+  createRecipeCategoryAction,
+  updateRecipeCategoryAction,
+} from "@/lib/actions/recipeCategory";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-interface RecipeDietFormProps {
+interface RecipeCategoryFormProps {
   isOpen: boolean;
   onClose: (shouldRefetch: boolean) => void;
-  diet?: RecipeDiet | null;
+  category?: RecipeCategory | null;
 }
 
 function SubmitButton({ isEditing }: { isEditing: boolean }) {
@@ -34,18 +37,22 @@ function SubmitButton({ isEditing }: { isEditing: boolean }) {
         ? "Salvando..."
         : isEditing
         ? "Salvar Alterações"
-        : "Criar Dieta"}
+        : "Criar Categoria"}
     </Button>
   );
 }
 
-export function RecipeDietForm({ isOpen, onClose, diet }: RecipeDietFormProps) {
+export function RecipeCategoryForm({
+  isOpen,
+  onClose,
+  category,
+}: RecipeCategoryFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
-  const isEditing = !!diet;
+  const isEditing = !!category;
 
   const action = isEditing
-    ? updateDietAction.bind(null, diet.id)
-    : createDietAction;
+    ? updateRecipeCategoryAction.bind(null, category.id)
+    : createRecipeCategoryAction;
   const [state, dispatch] = useActionState(action, { success: false });
 
   useEffect(() => {
@@ -67,11 +74,13 @@ export function RecipeDietForm({ isOpen, onClose, diet }: RecipeDietFormProps) {
     <Dialog open={isOpen} onOpenChange={() => onClose(false)}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{isEditing ? "Editar Dieta" : "Nova Dieta"}</DialogTitle>
+          <DialogTitle>
+            {isEditing ? "Editar Categoria" : "Nova Categoria"}
+          </DialogTitle>
           <DialogDescription>
             {isEditing
-              ? "Faça alterações na dieta aqui."
-              : "Adicione uma nova dieta à lista."}
+              ? "Faça alterações na categoria aqui."
+              : "Adicione uma nova categoria à lista."}
           </DialogDescription>
         </DialogHeader>
         <form ref={formRef} action={dispatch} className="space-y-4">
@@ -80,7 +89,7 @@ export function RecipeDietForm({ isOpen, onClose, diet }: RecipeDietFormProps) {
             <Input
               id="name"
               name="name"
-              defaultValue={diet?.name ?? ""}
+              defaultValue={category?.name ?? ""}
               required
             />
           </div>

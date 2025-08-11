@@ -3,29 +3,29 @@
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import {
-  createRecipeDiet,
-  updateRecipeDiet,
-  deleteRecipeDiet,
-  getRecipeDiets,
-} from "@/lib/api/recipeDiets";
-import { recipeDietSchema } from "@/lib/schemas/recipes";
+  createRecipeCategory,
+  updateRecipeCategory,
+  deleteRecipeCategory,
+  getRecipeCategories,
+} from "@/lib/api/recipeCategories";
+import { recipeCategorySchema } from "@/lib/schemas/recipes";
 import { ActionState, FetchParams, PaginatedResponse } from "../types/api";
-import { RecipeDiet } from "../types/recipe";
+import { RecipeCategory } from "../types/recipe";
 
-export async function getRecipeDietsAction(
+export async function getRecipeCategoriesAction(
   params: FetchParams
-): Promise<PaginatedResponse<RecipeDiet>> {
+): Promise<PaginatedResponse<RecipeCategory>> {
   const cookieStore = await cookies();
   const token = cookieStore.get("session_token")?.value;
   if (!token) {
     throw new Error("Não autorizado");
   }
 
-  const diets = await getRecipeDiets(token, params);
-  return diets;
+  const categories = await getRecipeCategories(token, params);
+  return categories;
 }
 
-export async function createRecipeDietAction(
+export async function createRecipeCategoryAction(
   _prevState: ActionState | undefined,
   formData: FormData
 ): Promise<ActionState> {
@@ -33,7 +33,7 @@ export async function createRecipeDietAction(
   const token = cookieStore.get("session_token")?.value;
   if (!token) return { message: "Não autorizado", success: false };
 
-  const validatedFields = recipeDietSchema.safeParse({
+  const validatedFields = recipeCategorySchema.safeParse({
     name: formData.get("name"),
   });
 
@@ -45,18 +45,18 @@ export async function createRecipeDietAction(
   }
 
   try {
-    await createRecipeDiet(validatedFields.data, token);
-    revalidatePath("/dashboard/recipe-diets");
-    return { message: "Dieta criada com sucesso!", success: true };
+    await createRecipeCategory(validatedFields.data, token);
+    revalidatePath("/dashboard/recipe-categories");
+    return { message: "Categoria criada com sucesso!", success: true };
   } catch (error: any) {
     return {
-      message: error.message || "Falha ao criar dieta.",
+      message: error.message || "Falha ao criar categoria.",
       success: false,
     };
   }
 }
 
-export async function updateRecipeDietAction(
+export async function updateRecipeCategoryAction(
   id: number,
   _prevState: ActionState | undefined,
   formData: FormData
@@ -65,7 +65,7 @@ export async function updateRecipeDietAction(
   const token = cookieStore.get("session_token")?.value;
   if (!token) return { message: "Não autorizado", success: false };
 
-  const validatedFields = recipeDietSchema.safeParse({
+  const validatedFields = recipeCategorySchema.safeParse({
     name: formData.get("name"),
   });
 
@@ -77,29 +77,31 @@ export async function updateRecipeDietAction(
   }
 
   try {
-    await updateRecipeDiet(id, validatedFields.data, token);
-    revalidatePath("/dashboard/recipe-diets");
-    return { message: "Dieta atualizada com sucesso!", success: true };
+    await updateRecipeCategory(id, validatedFields.data, token);
+    revalidatePath("/dashboard/recipe-categories");
+    return { message: "Categoria atualizada com sucesso!", success: true };
   } catch (error: any) {
     return {
-      message: error.message || "Falha ao atualizar dieta.",
+      message: error.message || "Falha ao atualizar categoria.",
       success: false,
     };
   }
 }
 
-export async function deleteRecipeDietAction(id: number): Promise<ActionState> {
+export async function deleteRecipeCategoryAction(
+  id: number
+): Promise<ActionState> {
   const cookieStore = await cookies();
   const token = cookieStore.get("session_token")?.value;
   if (!token) return { message: "Não autorizado", success: false };
 
   try {
-    await deleteRecipeDiet(id, token);
-    revalidatePath("/dashboard/recipe-diets");
-    return { message: "Dieta excluída com sucesso.", success: true };
+    await deleteRecipeCategory(id, token);
+    revalidatePath("/dashboard/recipe-categories");
+    return { message: "Categoria excluída com sucesso.", success: true };
   } catch (error: any) {
     return {
-      message: error.message || "Falha ao excluir dieta.",
+      message: error.message || "Falha ao excluir categoria.",
       success: false,
     };
   }

@@ -1,0 +1,99 @@
+"use client";
+
+import { useActionState, useEffect, useRef } from "react";
+import { useFormStatus } from "react-dom";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RecipeDiet } from "@/lib/types/recipe";
+import { createRecipeDietAction, updateRecipeDietAction } from "@/lib/actions/recipeDiet";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
+
+interface RecipeDietFormProps {
+  isOpen: boolean;
+  onClose: (shouldRefetch: boolean) => void;
+  diet?: RecipeDiet | null;
+}
+
+function SubmitButton({ isEditing }: { isEditing: boolean }) {
+  const { pending } = useFormStatus();
+  return (
+    <Button type="submit" disabled={pending}>
+      {pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+      {pending
+        ? "Salvando..."
+        : isEditing
+        ? "Salvar Alterações"
+        : "Criar Dieta"}
+    </Button>
+  );
+}
+
+export function RecipeDietForm({ isOpen, onClose, diet }: RecipeDietFormProps) {
+  const formRef = useRef<HTMLFormElement>(null);
+  const isEditing = !!diet;
+
+  const action = isEditing
+    ? updateRecipeDietAction.bind(null, diet.id)
+    : createRecipeDietAction;
+  const [state, dispatch] = useActionState(action, { success: false });
+
+  useEffect(() => {
+    if (state.success) {
+      toast.success(state.message || "Operação realizada com sucesso!");
+      onClose(true);
+    } else if (state.message && !state.success) {
+      toast.error(state.message);
+    }
+  }, [state, onClose]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      formRef.current?.reset();
+    }
+  }, [isOpen]);
+
+  return (
+    <Dialog open={isOpen} onOpenChange={() => onClose(false)}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>{isEditing ? "Editar Dieta" : "Nova Dieta"}</DialogTitle>
+          <DialogDescription>
+            {isEditing
+              ? "Faça alterações na dieta aqui."
+              : "Adicione uma nova dieta à lista."}
+          </DialogDescription>
+        </DialogHeader>
+        <form ref={formRef} action={dispatch} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">Nome</Label>
+            <Input
+              id="name"
+              name="name"
+              defaultValue={diet?.name ?? ""}
+              required
+            />
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="button" variant="outline">
+                Cancelar
+              </Button>
+            </DialogClose>
+            <SubmitButton isEditing={isEditing} />
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}

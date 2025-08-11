@@ -23,17 +23,17 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { DataTableColumnHeader } from "@/components/shared/dataTable";
-import { RecipeDiet } from "@/lib/types/recipe";
-import { deleteRecipeDietAction } from "@/lib/actions/recipeDiet";
+import { RecipeCategory } from "@/lib/types/recipe";
+import { deleteRecipeCategoryAction } from "@/lib/actions/recipeCategory";
 import { toast } from "sonner";
 
 function ActionCell({
-  diet,
+  category,
   onEdit,
   onDelete,
 }: {
-  diet: RecipeDiet;
-  onEdit: (diet: RecipeDiet) => void;
+  category: RecipeCategory;
+  onEdit: (category: RecipeCategory) => void;
   onDelete: () => void;
 }) {
   const [isDeleting, setIsDeleting] = useState(false);
@@ -42,16 +42,16 @@ function ActionCell({
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      const result = await deleteRecipeDietAction(diet.id);
+      const result = await deleteRecipeCategoryAction(category.id);
       if (result.success) {
-        toast.success(result.message || "Dieta excluída com sucesso");
+        toast.success(result.message || "Categoria excluída com sucesso");
         onDelete();
       } else {
-        toast.error(result.message || "Erro ao excluir dieta");
+        toast.error(result.message || "Erro ao excluir categoria");
       }
     } catch (error) {
-      console.error("Erro ao excluir dieta:", error);
-      toast.error("Erro ao excluir dieta");
+      console.error("Erro ao excluir categoria:", error);
+      toast.error("Erro ao excluir categoria");
     } finally {
       setIsDeleting(false);
       setShowDeleteDialog(false);
@@ -73,7 +73,7 @@ function ActionCell({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Ações</DropdownMenuLabel>
-          <DropdownMenuItem onClick={() => onEdit(diet)}>
+          <DropdownMenuItem onClick={() => onEdit(category)}>
             Editar
           </DropdownMenuItem>
           <DropdownMenuSeparator />
@@ -91,8 +91,8 @@ function ActionCell({
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja excluir a dieta {diet.name}? Esta ação não
-              pode ser desfeita.
+              Tem certeza que deseja excluir a categoria {category.name}? Esta
+              ação não pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -108,9 +108,9 @@ function ActionCell({
 }
 
 export const getColumns = (
-  onEdit: (diet: RecipeDiet) => void,
+  onEdit: (category: RecipeCategory) => void,
   onRefetch: () => void
-): ColumnDef<RecipeDiet>[] => [
+): ColumnDef<RecipeCategory>[] => [
   {
     accessorKey: "name",
     header: ({ column }) => (
@@ -125,7 +125,11 @@ export const getColumns = (
     enableHiding: false,
     cell: ({ row }) => (
       <div className="text-right">
-        <ActionCell diet={row.original} onEdit={onEdit} onDelete={onRefetch} />
+        <ActionCell
+          category={row.original}
+          onEdit={onEdit}
+          onDelete={onRefetch}
+        />
       </div>
     ),
   },

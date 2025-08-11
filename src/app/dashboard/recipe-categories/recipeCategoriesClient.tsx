@@ -5,20 +5,21 @@ import { EntityPage } from "@/components/shared/entityPage";
 import { DataTable } from "@/components/shared/dataTable";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
-import { RecipeDiet } from "@/lib/types/recipe";
+import { RecipeCategory } from "@/lib/types/recipe";
 import { getColumns } from "./columns";
 import { Toaster } from "sonner";
-import { RecipeDietForm } from "@/components/recipes/recipeDietsForm";
-import { getRecipeDietsAction } from "@/lib/actions/recipeDiet";
+import { RecipeCategoryForm } from "@/components/recipes/recipeCategoriesForm";
+import { getRecipeCategoriesAction } from "@/lib/actions/recipeCategory";
 import { useDataTable } from "@/hooks/useDataTable";
 import { FetchParams } from "@/lib/types/api";
 
-export function RecipeDietsClient() {
+export function RecipeCategoriesClient() {
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [selectedDiet, setSelectedDiet] = useState<RecipeDiet | null>(null);
+  const [selectedCategory, setSelectedCategory] =
+    useState<RecipeCategory | null>(null);
 
-  const fetchDiets = useCallback(async (params: FetchParams) => {
-    const result = await getRecipeDietsAction(params);
+  const fetchCategories = useCallback(async (params: FetchParams) => {
+    const result = await getRecipeCategoriesAction(params);
     return {
       data: result.data,
       pageCount: result.meta.last_page,
@@ -26,18 +27,18 @@ export function RecipeDietsClient() {
   }, []);
 
   const { data, pageCount, isLoading, tableState, tableHandlers, refetch } =
-    useDataTable<RecipeDiet>({
-      fetchData: fetchDiets,
+    useDataTable<RecipeCategory>({
+      fetchData: fetchCategories,
       pageSize: 10,
     });
 
   const handleNew = () => {
-    setSelectedDiet(null);
+    setSelectedCategory(null);
     setIsFormOpen(true);
   };
 
-  const handleEdit = useCallback((diet: RecipeDiet) => {
-    setSelectedDiet(diet);
+  const handleEdit = useCallback((category: RecipeCategory) => {
+    setSelectedCategory(category);
     setIsFormOpen(true);
   }, []);
 
@@ -57,13 +58,13 @@ export function RecipeDietsClient() {
     <>
       <Toaster richColors position="top-right" />
       <EntityPage
-        title="Dietas de Receita"
-        description="Gerencie as dietas de receitas cadastradas."
+        title="Categorias de Receita"
+        description="Gerencie as categorias de receitas cadastradas."
         isLoading={isLoading}
         actions={
           <Button onClick={handleNew}>
             <PlusCircle className="mr-2 h-4 w-4" />
-            Nova Dieta
+            Nova Categoria
           </Button>
         }
       >
@@ -87,10 +88,10 @@ export function RecipeDietsClient() {
         />
       </EntityPage>
 
-      <RecipeDietForm
+      <RecipeCategoryForm
         isOpen={isFormOpen}
         onClose={handleFormClose}
-        diet={selectedDiet}
+        category={selectedCategory}
       />
     </>
   );
