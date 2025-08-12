@@ -12,7 +12,7 @@ export const updateProfileSchema = z.object({
   name: z
     .string()
     .min(3, { message: "O nome deve ter pelo menos 3 caracteres." }),
-  email: z.email({ message: "Por favor, insira um email válido." }),
+  email: z.string().email({ message: "Por favor, insira um email válido." }),
   phone: z.string().optional().or(z.literal("")),
   birthday: z.string().optional().or(z.literal("")),
   image: z

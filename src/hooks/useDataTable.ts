@@ -34,8 +34,6 @@ export function useDataTable<TData>({
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-
-  // Debounced search
   const [debouncedFilter, setDebouncedFilter] = useState(globalFilter);
 
   useEffect(() => {
@@ -70,7 +68,6 @@ export function useDataTable<TData>({
     loadData();
   }, [loadData]);
 
-  // Reset pagination when filters change
   useEffect(() => {
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
   }, [debouncedFilter, columnFilters]);

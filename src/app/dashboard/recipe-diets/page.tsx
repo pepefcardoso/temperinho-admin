@@ -8,6 +8,7 @@ import {
   updateRecipeDietAction,
   deleteRecipeDietAction,
 } from "@/lib/actions/recipeDiet";
+import { recipeDietSchema } from "@/lib/schemas/recipes";
 
 export default function RecipeDietsPage() {
   return (
@@ -21,10 +22,7 @@ export default function RecipeDietsPage() {
         update: updateRecipeDietAction,
         delete: deleteRecipeDietAction,
       }}
-      validationRules={{
-        minLength: 3,
-        maxLength: 100,
-      }}
+      schema={recipeDietSchema} 
     />
   );
 }

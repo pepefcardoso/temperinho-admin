@@ -8,6 +8,7 @@ import {
   updateRecipeCategoryAction,
   deleteRecipeCategoryAction,
 } from "@/lib/actions/recipeCategory";
+import { recipeCategorySchema } from "@/lib/schemas/recipes";
 
 export default function RecipeCategoriesPage() {
   return (
@@ -21,10 +22,7 @@ export default function RecipeCategoriesPage() {
         update: updateRecipeCategoryAction,
         delete: deleteRecipeCategoryAction,
       }}
-      validationRules={{
-        minLength: 3,
-        maxLength: 100,
-      }}
+      schema={recipeCategorySchema} 
     />
   );
 }

@@ -10,6 +10,7 @@ import { EntityForm, BaseEntity } from "./entityForm";
 import { getBaseColumns } from "./crudColumns";
 import { useEntityCrud, EntityCrudActions } from "@/hooks/useEntityCrud";
 import { ColumnDef } from "@tanstack/react-table";
+import z from "zod";
 
 interface CrudPageProps<T extends BaseEntity> {
     title: string;
@@ -19,12 +20,7 @@ interface CrudPageProps<T extends BaseEntity> {
     pageSize?: number;
     additionalColumns?: ColumnDef<T>[];
     renderAdditionalFormFields?: (entity?: T | null) => ReactNode;
-    validationRules?: {
-        minLength?: number;
-        maxLength?: number;
-        pattern?: string;
-        patternMessage?: string;
-    };
+    schema: z.Schema<any>;
 }
 
 export function CrudPage<T extends BaseEntity>({
@@ -35,7 +31,7 @@ export function CrudPage<T extends BaseEntity>({
     pageSize = 10,
     additionalColumns = [],
     renderAdditionalFormFields,
-    validationRules,
+    schema,
 }: CrudPageProps<T>) {
     const {
         data,
@@ -106,7 +102,7 @@ export function CrudPage<T extends BaseEntity>({
                 createAction={actions.create}
                 updateAction={actions.update}
                 renderAdditionalFields={renderAdditionalFormFields}
-                validationRules={validationRules}
+                schema={schema}
             />
         </>
     );

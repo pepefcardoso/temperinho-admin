@@ -1,7 +1,9 @@
 "use client";
 
-import { useActionState, useEffect, useRef } from "react";
-import { useFormStatus } from "react-dom";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
     Dialog,
     DialogContent,
@@ -38,26 +40,7 @@ interface EntityFormProps<T extends BaseEntity> {
         formData: FormData
     ) => Promise<ActionState>;
     renderAdditionalFields?: (entity?: T | null) => React.ReactNode;
-    validationRules?: {
-        minLength?: number;
-        maxLength?: number;
-        pattern?: string;
-        patternMessage?: string;
-    };
-}
-
-function SubmitButton({ isEditing, entityName }: { isEditing: boolean; entityName: string }) {
-    const { pending } = useFormStatus();
-    return (
-        <Button type="submit" disabled={pending}>
-            {pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {pending
-                ? "Salvando..."
-                : isEditing
-                    ? "Salvar Alterações"
-                    : `Criar ${entityName}`}
-        </Button>
-    );
+    schema: z.Schema<any>;
 }
 
 export function EntityForm<T extends BaseEntity>({
@@ -67,59 +50,78 @@ export function EntityForm<T extends BaseEntity>({
     entityName,
     createAction,
     updateAction,
+    schema,
     renderAdditionalFields,
-    validationRules = { minLength: 3 },
 }: EntityFormProps<T>) {
-    const formRef = useRef<HTMLFormElement>(null);
     const isEditing = !!entity;
 
-    const action = isEditing
-        ? updateAction.bind(null, entity.id)
-        : createAction;
-
-    const [state, dispatch] = useActionState(action, { success: false });
+    const {
+        register,
+        handleSubmit,
+        formState: { errors, isSubmitting },
+        reset,
+    } = useForm<z.infer<typeof schema>>({
+        resolver: zodResolver(schema),
+        defaultValues: entity || { name: "" },
+    });
 
     useEffect(() => {
+        if (isOpen) {
+            reset(entity ?? { name: "" });
+        }
+    }, [isOpen, entity, reset]);
+
+    const processForm = async (data: z.infer<typeof schema>) => {
+        const formData = new FormData();
+        for (const key in data) {
+            formData.append(key, data[key]);
+        }
+
+        const action = isEditing
+            ? updateAction.bind(null, entity.id)
+            : createAction;
+
+        const state = await action(undefined, formData);
+
         if (state.success) {
             toast.success(state.message || "Operação realizada com sucesso!");
             onClose(true);
-        } else if (state.message && !state.success) {
-            toast.error(state.message);
+        } else {
+            toast.error(state.message || "Ocorreu um erro ao processar a solicitação.");
         }
-    }, [state, onClose]);
+    };
 
-    useEffect(() => {
-        if (!isOpen) {
-            formRef.current?.reset();
-        }
-    }, [isOpen]);
+    const entityGenderSuffix = entityName.endsWith('a') ? 'a' : 'o';
+    const entityArticle = entityName.endsWith('a') ? 'a' : 'o';
+    const entityArticleUpper = entityName.endsWith('a') ? 'a' : '';
+
 
     return (
         <Dialog open={isOpen} onOpenChange={() => onClose(false)}>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle>
-                        {isEditing ? `Editar ${entityName}` : `Nov${entityName.endsWith('a') ? 'a' : 'o'} ${entityName}`}
+                        {isEditing ? `Editar ${entityName}` : `Nov${entityGenderSuffix} ${entityName}`}
                     </DialogTitle>
                     <DialogDescription>
                         {isEditing
-                            ? `Faça alterações n${entityName.endsWith('a') ? 'a' : 'o'} ${entityName.toLowerCase()} aqui.`
-                            : `Adicione um${entityName.endsWith('a') ? 'a' : ''} nov${entityName.endsWith('a') ? 'a' : 'o'} ${entityName.toLowerCase()} à lista.`}
+                            ? `Faça alterações n${entityArticle} ${entityName.toLowerCase()} aqui.`
+                            : `Adicione um${entityArticleUpper} nov${entityGenderSuffix} ${entityName.toLowerCase()} à lista.`}
                     </DialogDescription>
                 </DialogHeader>
-                <form ref={formRef} action={dispatch} className="space-y-4">
+                <form onSubmit={handleSubmit(processForm)} className="space-y-4">
                     <div className="space-y-2">
                         <Label htmlFor="name">Nome</Label>
                         <Input
                             id="name"
-                            name="name"
-                            defaultValue={entity?.name ?? ""}
-                            required
-                            minLength={validationRules.minLength}
-                            maxLength={validationRules.maxLength}
-                            pattern={validationRules.pattern}
-                            title={validationRules.patternMessage}
+                            {...register("name")}
+                            aria-invalid={errors.name ? "true" : "false"}
                         />
+                        {errors.name && (
+                            <p className="text-sm text-destructive">
+                                {`${errors.name.message}`}
+                            </p>
+                        )}
                     </div>
 
                     {renderAdditionalFields && renderAdditionalFields(entity)}
@@ -130,7 +132,14 @@ export function EntityForm<T extends BaseEntity>({
                                 Cancelar
                             </Button>
                         </DialogClose>
-                        <SubmitButton isEditing={isEditing} entityName={entityName} />
+                        <Button type="submit" disabled={isSubmitting}>
+                            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            {isSubmitting
+                                ? "Salvando..."
+                                : isEditing
+                                    ? "Salvar Alterações"
+                                    : `Criar ${entityName}`}
+                        </Button>
                     </DialogFooter>
                 </form>
             </DialogContent>
