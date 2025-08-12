@@ -14,15 +14,12 @@ import {
     DialogClose,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { ActionState } from "@/lib/types/api";
 
 export interface BaseEntity {
     id: number;
-    name: string;
 }
 
 interface EntityFormProps<T extends BaseEntity> {
@@ -56,18 +53,17 @@ export function EntityForm<T extends BaseEntity>({
     const isEditing = !!entity;
 
     const {
-        register,
         handleSubmit,
-        formState: { errors, isSubmitting },
+        formState: { isSubmitting },
         reset,
     } = useForm<z.infer<typeof schema>>({
         resolver: zodResolver(schema),
-        defaultValues: entity || { name: "" },
+        defaultValues: entity || {},
     });
 
     useEffect(() => {
         if (isOpen) {
-            reset(entity ?? { name: "" });
+            reset(entity ?? {});
         }
     }, [isOpen, entity, reset]);
 
@@ -110,19 +106,6 @@ export function EntityForm<T extends BaseEntity>({
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit(processForm)} className="space-y-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="name">Nome</Label>
-                        <Input
-                            id="name"
-                            {...register("name")}
-                            aria-invalid={errors.name ? "true" : "false"}
-                        />
-                        {errors.name && (
-                            <p className="text-sm text-destructive">
-                                {`${errors.name.message}`}
-                            </p>
-                        )}
-                    </div>
 
                     {renderAdditionalFields && renderAdditionalFields(entity)}
 

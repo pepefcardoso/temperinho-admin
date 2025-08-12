@@ -5,7 +5,6 @@ import { toast } from "sonner";
 
 export interface BaseEntity {
   id: number;
-  name: string;
 }
 
 export interface EntityCrudActions<T extends BaseEntity> {

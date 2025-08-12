@@ -22,11 +22,9 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { DataTableColumnHeader } from "@/components/shared/dataTable";
 
 export interface BaseEntity {
     id: number;
-    name: string;
 }
 
 interface ActionCellProps<T extends BaseEntity> {
@@ -84,7 +82,7 @@ export function ActionCell<T extends BaseEntity>({
                     <AlertDialogHeader>
                         <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Tem certeza que deseja excluir {entityName.toLowerCase()} {entity.name}?
+                            Tem certeza que deseja excluir {entityName.toLowerCase()} #{entity.id}?
                             Esta ação não pode ser desfeita.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
@@ -116,15 +114,6 @@ export function getBaseColumns<T extends BaseEntity>({
     additionalColumns = [],
 }: GetColumnsOptions<T>): ColumnDef<T>[] {
     return [
-        {
-            accessorKey: "name",
-            header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="Nome" />
-            ),
-            cell: ({ row }) => (
-                <div className="font-medium">{row.getValue("name")}</div>
-            ),
-        },
         ...additionalColumns,
         {
             id: "actions",

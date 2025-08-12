@@ -9,6 +9,34 @@ import {
   deleteRecipeDietAction,
 } from "@/lib/actions/recipeDiet";
 import { recipeDietSchema } from "@/lib/schemas/recipes";
+import { ColumnDef } from "@tanstack/react-table";
+import { DataTableColumnHeader } from "@/components/shared/dataTable";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+const columns: ColumnDef<RecipeDiet>[] = [
+  {
+    accessorKey: "name",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Nome" />
+    ),
+    cell: ({ row }) => (
+      <div className="font-medium">{row.getValue("name")}</div>
+    ),
+  },
+];
+
+const renderAdditionalFormFields = (entity?: RecipeDiet | null) => (
+  <div className="space-y-2">
+    <Label htmlFor="name">Nome</Label>
+    <Input
+      id="name"
+      name="name"
+      defaultValue={entity?.name ?? ""}
+      required
+    />
+  </div>
+);
 
 export default function RecipeDietsPage() {
   return (
@@ -22,7 +50,9 @@ export default function RecipeDietsPage() {
         update: updateRecipeDietAction,
         delete: deleteRecipeDietAction,
       }}
-      schema={recipeDietSchema} 
+      schema={recipeDietSchema}
+      additionalColumns={columns}
+      renderAdditionalFormFields={renderAdditionalFormFields}
     />
   );
 }
