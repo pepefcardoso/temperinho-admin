@@ -15,3 +15,11 @@ export const recipeCategorySchema = z.object({
 });
 
 export type RecipeCategoryFormData = z.infer<typeof recipeCategorySchema>;
+
+export const recipeUnitSchema = z.object({
+  name: z
+    .string()
+    .min(3, { message: "O nome deve ter pelo menos 3 caracteres." }),
+});
+
+export type RecipeUnitFormData = z.infer<typeof recipeUnitSchema>;

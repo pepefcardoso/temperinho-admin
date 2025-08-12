@@ -48,11 +48,10 @@ export async function createRecipeCategoryAction(
     await createRecipeCategory(validatedFields.data, token);
     revalidatePath("/dashboard/recipe-categories");
     return { message: "Categoria criada com sucesso!", success: true };
-  } catch (error: any) {
-    return {
-      message: error.message || "Falha ao criar categoria.",
-      success: false,
-    };
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Falha ao criar categoria.";
+    return { message, success: false };
   }
 }
 
@@ -80,11 +79,10 @@ export async function updateRecipeCategoryAction(
     await updateRecipeCategory(id, validatedFields.data, token);
     revalidatePath("/dashboard/recipe-categories");
     return { message: "Categoria atualizada com sucesso!", success: true };
-  } catch (error: any) {
-    return {
-      message: error.message || "Falha ao atualizar categoria.",
-      success: false,
-    };
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Falha ao atualizar categoria.";
+    return { message, success: false };
   }
 }
 
@@ -99,10 +97,9 @@ export async function deleteRecipeCategoryAction(
     await deleteRecipeCategory(id, token);
     revalidatePath("/dashboard/recipe-categories");
     return { message: "Categoria excluída com sucesso.", success: true };
-  } catch (error: any) {
-    return {
-      message: error.message || "Falha ao excluir categoria.",
-      success: false,
-    };
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Falha ao excluir categoria.";
+    return { message, success: false };
   }
 }

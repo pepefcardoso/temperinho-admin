@@ -3,29 +3,28 @@
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import {
-  createRecipeDiet,
-  updateRecipeDiet,
-  deleteRecipeDiet,
-  getRecipeDiets,
-} from "@/lib/api/recipeDiets";
-import { recipeDietSchema } from "@/lib/schemas/recipes";
+  createRecipeUnit,
+  updateRecipeUnit,
+  deleteRecipeUnit,
+  getRecipeUnits,
+} from "@/lib/api/recipeUnits";
+import { recipeUnitSchema } from "@/lib/schemas/recipes";
 import { ActionState, FetchParams, PaginatedResponse } from "../types/api";
-import { RecipeDiet } from "../types/recipe";
+import { RecipeUnit } from "../types/recipe";
 
-export async function getRecipeDietsAction(
+export async function getRecipeUnitsAction(
   params: FetchParams
-): Promise<PaginatedResponse<RecipeDiet>> {
+): Promise<PaginatedResponse<RecipeUnit>> {
   const cookieStore = await cookies();
   const token = cookieStore.get("session_token")?.value;
   if (!token) {
     throw new Error("Não autorizado");
   }
 
-  const diets = await getRecipeDiets(token, params);
-  return diets;
+  return getRecipeUnits(token, params);
 }
 
-export async function createRecipeDietAction(
+export async function createRecipeUnitAction(
   _prevState: ActionState | undefined,
   formData: FormData
 ): Promise<ActionState> {
@@ -33,7 +32,7 @@ export async function createRecipeDietAction(
   const token = cookieStore.get("session_token")?.value;
   if (!token) return { message: "Não autorizado", success: false };
 
-  const validatedFields = recipeDietSchema.safeParse({
+  const validatedFields = recipeUnitSchema.safeParse({
     name: formData.get("name"),
   });
 
@@ -45,17 +44,17 @@ export async function createRecipeDietAction(
   }
 
   try {
-    await createRecipeDiet(validatedFields.data, token);
-    revalidatePath("/dashboard/recipe-diets");
-    return { message: "Dieta criada com sucesso!", success: true };
+    await createRecipeUnit(validatedFields.data, token);
+    revalidatePath("/dashboard/recipe-units");
+    return { message: "Unidade criada com sucesso!", success: true };
   } catch (error: unknown) {
     const message =
-      error instanceof Error ? error.message : "Falha ao criar dieta.";
+      error instanceof Error ? error.message : "Falha ao criar unidade.";
     return { message, success: false };
   }
 }
 
-export async function updateRecipeDietAction(
+export async function updateRecipeUnitAction(
   id: number,
   _prevState: ActionState | undefined,
   formData: FormData
@@ -64,7 +63,7 @@ export async function updateRecipeDietAction(
   const token = cookieStore.get("session_token")?.value;
   if (!token) return { message: "Não autorizado", success: false };
 
-  const validatedFields = recipeDietSchema.safeParse({
+  const validatedFields = recipeUnitSchema.safeParse({
     name: formData.get("name"),
   });
 
@@ -76,28 +75,28 @@ export async function updateRecipeDietAction(
   }
 
   try {
-    await updateRecipeDiet(id, validatedFields.data, token);
-    revalidatePath("/dashboard/recipe-diets");
-    return { message: "Dieta atualizada com sucesso!", success: true };
+    await updateRecipeUnit(id, validatedFields.data, token);
+    revalidatePath("/dashboard/recipe-units");
+    return { message: "Unidade atualizada com sucesso!", success: true };
   } catch (error: unknown) {
     const message =
-      error instanceof Error ? error.message : "Falha ao atualizar dieta.";
+      error instanceof Error ? error.message : "Falha ao atualizar unidade.";
     return { message, success: false };
   }
 }
 
-export async function deleteRecipeDietAction(id: number): Promise<ActionState> {
+export async function deleteRecipeUnitAction(id: number): Promise<ActionState> {
   const cookieStore = await cookies();
   const token = cookieStore.get("session_token")?.value;
   if (!token) return { message: "Não autorizado", success: false };
 
   try {
-    await deleteRecipeDiet(id, token);
-    revalidatePath("/dashboard/recipe-diets");
-    return { message: "Dieta excluída com sucesso.", success: true };
+    await deleteRecipeUnit(id, token);
+    revalidatePath("/dashboard/recipe-units");
+    return { message: "Unidade excluída com sucesso.", success: true };
   } catch (error: unknown) {
     const message =
-      error instanceof Error ? error.message : "Falha ao excluir dieta.";
+      error instanceof Error ? error.message : "Falha ao excluir unidade.";
     return { message, success: false };
   }
 }
