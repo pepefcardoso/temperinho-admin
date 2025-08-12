@@ -1,5 +1,30 @@
-import { RecipeCategoriesClient } from "./recipeCategoriesClient";
+"use client";
 
-export default async function RecipeCategoriesPage() {
-  return <RecipeCategoriesClient />;
+import { CrudPage } from "@/components/shared/crud/crudPage";
+import { RecipeCategory } from "@/lib/types/recipe";
+import {
+  getRecipeCategoriesAction,
+  createRecipeCategoryAction,
+  updateRecipeCategoryAction,
+  deleteRecipeCategoryAction,
+} from "@/lib/actions/recipeCategory";
+
+export default function RecipeCategoriesPage() {
+  return (
+    <CrudPage<RecipeCategory>
+      title="Categorias de Receita"
+      description="Gerencie as categorias de receitas cadastradas."
+      entityName="Categoria"
+      actions={{
+        fetch: getRecipeCategoriesAction,
+        create: createRecipeCategoryAction,
+        update: updateRecipeCategoryAction,
+        delete: deleteRecipeCategoryAction,
+      }}
+      validationRules={{
+        minLength: 3,
+        maxLength: 100,
+      }}
+    />
+  );
 }
