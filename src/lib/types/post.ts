@@ -22,6 +22,7 @@ type PostBase = {
   ratings_count?: number;
   is_favorited: boolean;
   created_at: string;
+  company_id?: number | null;
 };
 
 export type PostCollectionItem = PostBase;

@@ -1,9 +1,16 @@
 import { Author } from "./user";
 
+export type Commentable = {
+  id: number;
+  type: 'post' | 'recipe';
+  title?: string;
+};
+
 export type Comment = {
   id: number;
   content: string;
   author?: Author;
+  commentable?: Commentable;
   created_at: string;
   updated_at: string;
 };

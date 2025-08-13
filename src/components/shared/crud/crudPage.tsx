@@ -21,6 +21,7 @@ interface CrudPageProps<T extends BaseEntity> {
     additionalColumns?: ColumnDef<T>[];
     renderAdditionalFormFields?: (entity?: T | null) => ReactNode;
     schema: z.Schema<any>;
+    isCreateEnabled?: boolean;
 }
 
 export function CrudPage<T extends BaseEntity>({
@@ -32,6 +33,7 @@ export function CrudPage<T extends BaseEntity>({
     additionalColumns = [],
     renderAdditionalFormFields,
     schema,
+    isCreateEnabled = true,
 }: CrudPageProps<T>) {
     const {
         data,
@@ -68,10 +70,12 @@ export function CrudPage<T extends BaseEntity>({
                 description={description}
                 isLoading={isLoading}
                 actions={
-                    <Button onClick={handleNew}>
-                        <PlusCircle className="mr-2 h-4 w-4" />
-                        Nov{entityName.endsWith('a') ? 'a' : 'o'} {entityName}
-                    </Button>
+                    isCreateEnabled ? (
+                        <Button onClick={handleNew}>
+                            <PlusCircle className="mr-2 h-4 w-4" />
+                            Nov{entityName.endsWith('a') ? 'a' : 'o'} {entityName}
+                        </Button>
+                    ) : null
                 }
             >
                 <DataTable

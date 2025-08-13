@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { updateUserProfile, updateUserPassword } from "@/lib/api/user";
-import { updateProfileSchema, updatePasswordSchema } from "@/lib/schemas/user";
+import { updateProfileSchema, updatePasswordSchema } from "@/lib/schemas/profile";
 import { User } from "../types/user";
 import { AxiosError } from "axios";
 import { ActionState } from "../types/api";

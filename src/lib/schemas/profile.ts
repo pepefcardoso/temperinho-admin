@@ -28,6 +28,8 @@ export const updateProfileSchema = z.object({
     ),
 });
 
+export type UpdateProfileData = z.infer<typeof updateProfileSchema>;
+
 export const updatePasswordSchema = z
   .object({
     password: z
@@ -40,5 +42,4 @@ export const updatePasswordSchema = z
     path: ["password_confirmation"],
   });
 
-export type UpdateProfileData = z.infer<typeof updateProfileSchema>;
 export type UpdatePasswordData = z.infer<typeof updatePasswordSchema>;

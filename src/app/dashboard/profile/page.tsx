@@ -1,11 +1,12 @@
-import { getSession } from "@/lib/auth";
+import { getSession, getToken } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { ProfileForm } from "@/components/profile/profileForm";
 import { PasswordForm } from "@/components/profile/passwordForm";
 import { User } from "@/lib/types/user";
 
 export default async function ProfilePage() {
-  const session = await getSession();
+  const token = await getToken();
+  const session = await getSession(token);
 
   if (!session || !session.user) {
     redirect("/auth/login?error=invalid_session");

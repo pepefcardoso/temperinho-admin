@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
-import { updateProfileAction, ProfileActionState } from "@/lib/actions/user";
+import { updateProfileAction, ProfileActionState } from "@/lib/actions/profile";
 import { User } from "@/lib/types/user";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";

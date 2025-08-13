@@ -1,6 +1,6 @@
 import { apiClient } from "./client";
 import { User } from "../types/user";
-import { UpdatePasswordData } from "../schemas/user";
+import { UpdatePasswordData } from "../schemas/profile";
 
 export async function updateUserProfile(
   userId: number,

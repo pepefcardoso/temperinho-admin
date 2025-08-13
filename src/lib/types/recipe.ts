@@ -41,6 +41,7 @@ type RecipeBase = {
   average_rating: number;
   ratings_count?: number;
   is_favorited: boolean;
+  company_id?: number | null;
 };
 
 export type RecipeCollectionItem = RecipeBase;
