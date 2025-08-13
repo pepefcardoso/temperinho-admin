@@ -32,11 +32,6 @@ export const navGroups: NavGroup[] = [
         href: "/dashboard/users",
         icon: "Users",
       },
-      {
-        title: "Imagens",
-        href: "/dashboard/images",
-        icon: "Image",
-      },
     ],
   },
   {
